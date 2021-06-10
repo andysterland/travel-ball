@@ -8,9 +8,15 @@ namespace FlightApi
 {
     public class PriceService : IPriceService
     {
-        public async Task<List<Price>> GetPrice(string DepartureAirportCode, string ArrivalAirportCode, DateTime Date)
+        public async Task<List<Price>> GetPrice(IAirportService airportService, string DepartureAirportCode, string ArrivalAirportCode, DateTime Date)
         {
-            throw new NotImplementedException();
+            var allPrices = new List<Price>();
+            var price = new Price();
+            price.Departure = airportService.GetAirport(DepartureAirportCode);
+            price.Destination = airportService.GetAirport(ArrivalAirportCode);
+            price.PriceUsd = 400;
+            allPrices.Add(price);
+            return allPrices;
         }
 
         public async Task<List<Price>> GetPrice(IAirportService airportService, IFlightDestinationService flightService, string DepartureAirportCode, DateTime Date)
@@ -29,7 +35,7 @@ namespace FlightApi
 
             foreach (var dest in destinations)
             {
-                var price = await GetPrice(departureAirport.ICAO, dest.ICAO, date);
+                var price = await GetPrice(airportService, departureAirport.ICAO, dest.ICAO, date);
                 allPrices.AddRange(price);
             }
 

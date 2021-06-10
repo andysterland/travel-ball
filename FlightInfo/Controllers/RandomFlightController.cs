@@ -10,14 +10,14 @@ namespace FlightInfo.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PriceController : Controller
+    public class RandomFlightController : Controller
     {
         private readonly IFlightDestinationService _flightService;
         private readonly IAirportService _airportService;
         private readonly IPriceService _priceService;
         private readonly ILogger _logger;
 
-        public PriceController(ILogger<PriceController> logger,
+        public RandomFlightController(ILogger<RandomFlightController> logger,
             IFlightDestinationService flightService,
             IAirportService airportService,
             IPriceService priceService)
@@ -28,18 +28,21 @@ namespace FlightInfo.Controllers
             _priceService = priceService;
         }
 
-        [HttpGet("{ICAO}", Name = "GetPrice")]
-        public async Task<IActionResult> GetPriceAsync(string DepartureICAO)
-        {
-            var date = DateTime.Now;
-            var allPrices = await _priceService.GetPrice(_airportService, _flightService, DepartureICAO, date);
+        // GET: api/Departur/LHR
 
-            if(allPrices == null || allPrices.Count == 0)
+        [HttpGet("{ICAO}", Name = "GetRandomDestination")]
+        public async Task<IActionResult> GetRandomDestinationAsync(string ICAO)
+        {
+            var allPrices = await _priceService.GetPrice(_airportService, _flightService, ICAO, DateTime.Now);
+
+            if (allPrices == null || allPrices.Count == 0)
             {
                 NotFound();
             }
 
-            return Ok(allPrices);
+            var random = new Random();
+            int index = random.Next(allPrices.Count);
+            return Ok(allPrices[index]);
         }
     }
 }
