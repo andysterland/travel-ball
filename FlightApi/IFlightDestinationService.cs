@@ -9,8 +9,7 @@ namespace FlightApi
 {
     public interface IFlightDestinationService
     {
-        public Task<List<string>> GetDestinationAirports(string AirportCode);
-        public Task<List<string>> GetDestinationAirports(string AirportCode, DateTime Date);
+        public Task<List<Airport>> GetDestinationAirports(IAirportService AirportService, string AirportCode, DateTime Date);
         public void Configure(string User, string Pass);
     }
 }

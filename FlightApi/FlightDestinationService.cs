@@ -9,11 +9,8 @@ using System.Threading.Tasks;
 namespace FlightApi
 {
     public class FlightDestinationService : IFlightDestinationService
-    { 
-        private string _user;
-        private string _password;
-        private string _baseUri;
-        private string _departureEndPoint =  "{0}/api/flights/departure?airport={1}&begin={2}&end={3}";
+    {
+        private OpenSkyWrapper _opensky;
 
         public FlightDestinationService()
         {
@@ -32,41 +29,25 @@ namespace FlightApi
                 throw new ArgumentNullException(nameof(Password));
             }
 
-            _user = User;
-            _password = Password;
-            _baseUri = string.Format("https://{0}:{1}@opensky-network.org", _user, _password);
+            _opensky = new OpenSkyWrapper(User, Password);
         }
 
-        // https://andster:Password@1@opensky-network.org/api/flights/departure?airport=EDDF&begin=1517227200&end=1517230800
-        public async Task<List<string>> GetDestinationAirports(string AirportCode)
+        public async Task<List<Airport>> GetDestinationAirports(IAirportService AirportService, string AirportCode, DateTime Date)
         {
-            return await GetDestinationAirports(AirportCode, DateTime.Now);
-        }
+            var airportCodes = await _opensky.GetDestinationAirports(AirportCode, Date);
 
-        public async Task<List<string>> GetDestinationAirports(string AirportCode, DateTime Date)
-        {
-            var StartDate = Date.AddDays(-7);
-            var EndDate = StartDate.AddDays(1);
-            
-            var uri = string.Format(_departureEndPoint, _baseUri, AirportCode, Utilities.GetUnixTime(StartDate), Utilities.GetUnixTime(EndDate));
+            var airports = new List<Airport>();
 
-            using var client = new HttpClient();
-            var response = await client.GetAsync(uri);
-            var responseText = await response.Content.ReadAsStringAsync();
-
-            var airports = JsonSerializer.Deserialize<OpenSkyDepatureAirport[]>(responseText);
-
-            var result = new Dictionary<string, string>();
-
-            foreach(var airport in airports)
+            foreach (var airportCode in airportCodes)
             {
-                if(!string.IsNullOrEmpty(airport.estArrivalAirport) && !result.ContainsKey(airport.estArrivalAirport))
+                var airport = AirportService.GetAirport(airportCode);
+                if (airport != null)
                 {
-                    result.Add(airport.estArrivalAirport, airport.estArrivalAirport);
+                    airports.Add(airport);
                 }
             }
 
-            return result.Keys.ToList();
+            return airports;
         }
     }
 }

@@ -29,22 +29,11 @@ namespace FlightInfo.Controllers
         [HttpGet("{ICAO}", Name = "Get")]
         public async Task<IActionResult> GetDestinationsAsync(string ICAO)
         {
-            var airportCodes = await _flightService.GetDestinationAirports(ICAO);
+            var airports = await _flightService.GetDestinationAirports(_airportService, ICAO, DateTime.Now);
 
-            if(airportCodes == null || airportCodes.Count == 0)
+            if(airports == null || airports.Count == 0)
             {
                 return NotFound();
-            }
-
-            var airports = new List<Airport>();
-
-            foreach(var airportCode in airportCodes)
-            {
-                var airport = _airportService.GetAirport(airportCode);
-                if (airport != null)
-                {
-                    airports.Add(airport);
-                }
             }
 
             return Ok(airports);
