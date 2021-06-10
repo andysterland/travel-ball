@@ -1,4 +1,4 @@
-using FlightObjectModel;
+using FlightApi;
 using NUnit.Framework;
 
 namespace FlightTests

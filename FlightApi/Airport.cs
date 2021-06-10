@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FlightObjectModel
+namespace FlightApi
 {
     public class Airport
     {
@@ -16,6 +16,5 @@ namespace FlightObjectModel
         public string ICAO { get; set; }
         public double Lat { get; set; }
         public double Long { get; set; }
-
     }
 }
