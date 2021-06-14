@@ -29,7 +29,7 @@ namespace FlightInfo.Controllers
         }
 
         [HttpGet("{DepatureIcao}")]
-        public async Task<IActionResult> Get(string DepatureIcao)
+        public async Task<IActionResult> GetRandomFlight(string DepatureIcao)
         {
             var allPrices = await _priceService.GetPrice(_airportService, _flightService, DepatureIcao, DateTime.Now);
 

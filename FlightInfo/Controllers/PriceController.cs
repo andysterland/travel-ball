@@ -29,7 +29,7 @@ namespace FlightInfo.Controllers
         }
 
         [HttpGet("{DepartureICAO}")]
-        public async Task<IActionResult> Get(string DepartureICAO)
+        public async Task<IActionResult> GetFlightPrices(string DepartureICAO)
         {
             var date = DateTime.Now;
             var allPrices = await _priceService.GetPrice(_airportService, _flightService, DepartureICAO, date);

@@ -27,7 +27,7 @@ namespace FlightInfo.Controllers
         }
 
         [HttpGet("{DepartureIcao}")]
-        public async Task<IActionResult> Get(string DepartureIcao)
+        public async Task<IActionResult> GetDestinations(string DepartureIcao)
         {
             var airports = await _flightService.GetDestinationAirports(_airportService, DepartureIcao, DateTime.Now);
 
