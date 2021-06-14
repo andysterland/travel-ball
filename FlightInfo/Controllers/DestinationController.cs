@@ -26,12 +26,10 @@ namespace FlightInfo.Controllers
             _priceService = priceService;
         }
 
-        // GET: api/Departur/LHR
-
-        [HttpGet("{ICAO}", Name = "GetDestinations")]
-        public async Task<IActionResult> GetDestinationsAsync(string ICAO)
+        [HttpGet("{DepartureIcao}")]
+        public async Task<IActionResult> Get(string DepartureIcao)
         {
-            var airports = await _flightService.GetDestinationAirports(_airportService, ICAO, DateTime.Now);
+            var airports = await _flightService.GetDestinationAirports(_airportService, DepartureIcao, DateTime.Now);
 
             if(airports == null || airports.Count == 0)
             {

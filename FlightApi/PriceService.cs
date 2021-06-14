@@ -8,14 +8,18 @@ namespace FlightApi
 {
     public class PriceService : IPriceService
     {
+        private RandomPriceApiWrapper _randomPriceApiWrapper = new RandomPriceApiWrapper();
         public async Task<List<Price>> GetPrice(IAirportService airportService, string DepartureAirportCode, string ArrivalAirportCode, DateTime Date)
         {
             var allPrices = new List<Price>();
             var price = new Price();
+
             price.Departure = airportService.GetAirport(DepartureAirportCode);
             price.Destination = airportService.GetAirport(ArrivalAirportCode);
-            price.PriceUsd = 400;
+            price.PriceUsd = await _randomPriceApiWrapper.GetPrice(Date, DepartureAirportCode, ArrivalAirportCode);
+
             allPrices.Add(price);
+            
             return allPrices;
         }
 

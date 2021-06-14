@@ -28,8 +28,8 @@ namespace FlightInfo.Controllers
             _priceService = priceService;
         }
 
-        [HttpGet("{ICAO}", Name = "GetPrice")]
-        public async Task<IActionResult> GetPriceAsync(string DepartureICAO)
+        [HttpGet("{DepartureICAO}")]
+        public async Task<IActionResult> Get(string DepartureICAO)
         {
             var date = DateTime.Now;
             var allPrices = await _priceService.GetPrice(_airportService, _flightService, DepartureICAO, date);

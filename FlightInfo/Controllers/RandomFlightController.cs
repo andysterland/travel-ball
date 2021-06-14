@@ -28,12 +28,10 @@ namespace FlightInfo.Controllers
             _priceService = priceService;
         }
 
-        // GET: api/Departur/LHR
-
-        [HttpGet("{ICAO}", Name = "GetRandomDestination")]
-        public async Task<IActionResult> GetRandomDestinationAsync(string ICAO)
+        [HttpGet("{DepatureIcao}")]
+        public async Task<IActionResult> Get(string DepatureIcao)
         {
-            var allPrices = await _priceService.GetPrice(_airportService, _flightService, ICAO, DateTime.Now);
+            var allPrices = await _priceService.GetPrice(_airportService, _flightService, DepatureIcao, DateTime.Now);
 
             if (allPrices == null || allPrices.Count == 0)
             {
