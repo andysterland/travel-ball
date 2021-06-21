@@ -32,7 +32,7 @@ namespace FlightInfo.Controllers
         [HttpGet]
         public async Task<IActionResult> GetNearestAirport(double Lat, double Long)
         {
-            var airports = _airportService.GetNearestAiport(Lat, Long);
+            var airports =  _airportService.GetNearestAiport(Lat, Long);
 
             if (airports == null)
             {

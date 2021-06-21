@@ -9,55 +9,93 @@
 @inject HttpClient Http
 @inject IJSRuntime JSRuntime
 
-<div class="departureInfoContainer">
+<div class="appContainer">
 
     <div class="appBanner">
-        <h1>Travell Ball!</h1>
-    </div>
-    <p class="">Choose the location and date you wish to travel below and we'll pick you a lucky destination!</p>
-
-    <div class="input-group mb-3">
-          <div class="input-group-prepend">
-            <span class="input-group-text" id="basic-addon1">When:</span>
-          </div>
-        <input id="" type="date" @bind="@DepatureDate" class="form-control" />
+        <h1 class="appTitle">Travell Ball!</h1>
     </div>
 
-    <div class="input-group mb-3">
-          <div class="input-group-prepend">
-            <span class="input-group-text" id="basic-addon1">From:</span>
-          </div>
-        <div class="input-group-append">
-            <input id="@_airportInfoBoxId" type="text" @bind="@DepatureAirport" class="form-control" placeholder="Airport" />
-            @if (GetGeoButtonIsBusy)
-            {
-                <div class="spinner-border text-secondary" role="status">
-                    <span class="sr-only">Loading...</span>
+    <div>
+        <div class="@InputView">
+            <p class="">Choose the location and date you wish to travel below and we'll pick you a lucky destination!</p>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">When:</span>
                 </div>
-            }
-            else
-            {
-                <button id="@_getGeoButtonId" class="btn btn-secondary px-3" @onclick="@GetGeoButton_OnClick"><i class="bi bi-geo-alt-fill"></i></button>
-            }
+                <input id="" type="date" @bind="@DepatureDate" class="form-control" />
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">From:</span>
+                </div>
+                <div class="input-group-append">
+                    <input id="@_airportInfoBoxId" type="text" @bind="@DepatureAirport" class="form-control" placeholder="Airport" />
+                    @if (GetGeoButtonIsBusy)
+                    {
+                        <div class="spinner-border text-secondary" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <button id="@_getGeoButtonId" class="btn btn-secondary px-3" @onclick="@GetGeoButton_OnClick"><i class="bi bi-geo-alt-fill"></i></button>
+                    }
+                </div>
+            </div>
+
+            <button class="btn btn-primary" type="submit" @onclick="@Luck_OnClick"><i class="bi-dice-5-fill"></i> I'm feeling lucky!</button>
+        </div>
+
+        <div class="@BusyView">
+            <p>Hang on in there while we find you a lucky flight!</p>
+            <progress></progress>
+        </div>
+
+        <div class="@OutputView">
+            <p>We've found it!</p>
+
+            <div class="flightInfoContainer">
+                <div>You are going to</div>
+                <div class="flightHighlight flightDest">@FlightDest</div>
+                <div>for</div>
+                <div class="flightHighlight flightCost">@FlightPrice</div>
+            </div>
+
+            <button class="btn btn-success" type="submit" @onclick="@Luck_OnClick"><i class="bi bi-currency-dollar"></i> Buy!</button>
+        </div>
+        <div class="spacer"></div>
+        <div class="alert alert-danger @ErrorView" role="alert">
+            <strong>Uh-oh!</strong> @ErrorMessage
         </div>
     </div>
-
-    <button class="btn btn-primary" type="submit" @onclick="@Luck_OnClick"><i class="bi-dice-5-fill"></i> I'm feeling lucky!</button>
-
 </div>
 
 @code {
     private string _serviceBaseUri;
-    private string _randomFligthUri = "/api/RandomFlight/{0}";
-    private string _nearestAirportUri = "/api/Departure/?Lat={0}&Long={1}";
-    private string _airportInfoBoxId = "airportInputBox";
-    private string _airportInfoBoxOptions = null;
-    private string _getGeoButtonId = "getGeoButton";
+    private const string _randomFligthUri = "/api/RandomFlight/{0}";
+    private const string _nearestAirportUri = "/api/Departure/?Lat={0}&Long={1}";
+    private const string _airportInfoBoxId = "airportInputBox";
+    private const string _airportInfoBoxOptions = null;
+    private const string _getGeoButtonId = "getGeoButton";
+    private const string _hiddenClass = "displayNone";
+    private const string _shownClass = "";
     private WindowNavigatorGeolocation _geolocationWrapper;
 
     public bool GetGeoButtonIsBusy { get; set; }
     public string DepatureAirport { get; set; }
     public DateTime DepatureDate { get; set; }
+
+    public string FlightDest { get; set; }
+    public string FlightPrice { get; set; }
+    
+    public string ErrorMessage { get; set; }
+
+    public string InputView = _hiddenClass;
+    public string OutputView = _hiddenClass;
+    public string BusyView = _hiddenClass;
+    public string ErrorView = _hiddenClass;
 
     protected override async Task OnInitializedAsync()
     {
@@ -70,6 +108,40 @@
         var window = await JSRuntime.Window();
         var navigator = await window.Navigator();
         _geolocationWrapper = navigator.Geolocation;
+
+        ShowInputView();
+    }
+
+    private void ShowInputView()
+    {
+        InputView = _shownClass;
+        BusyView = _hiddenClass;
+        OutputView = _hiddenClass;
+    }
+
+    private void ShowBusyView()
+    {
+        InputView = _hiddenClass;
+        BusyView = _shownClass;
+        OutputView = _hiddenClass;
+    }
+
+    private void ShowOutputView()
+    {
+        InputView = _hiddenClass;
+        BusyView = _hiddenClass;
+        OutputView = _shownClass;
+    }
+
+    public void ShowError(string Message)
+    {
+        ErrorView = _shownClass;
+        ErrorMessage = Message;
+    }
+
+    public void HideError()
+    {
+        ErrorView = _hiddenClass;        
     }
 
     public async Task GetGeoButton_OnClick()
@@ -108,8 +180,21 @@
 
     public async Task Luck_OnClick()
     {
+        HideError();
+        if(string.IsNullOrEmpty(DepatureAirport))
+        {
+            ShowError("Please choose a departure airport.");
+            return;
+        }
+
+        ShowBusyView();
         var iata = DepatureAirport.Substring(0, 3);
-        await GetRandomFlight(iata, DepatureDate);
+        var flight = await GetRandomFlight(iata, DepatureDate);
+
+        FlightDest = $"{flight.Destination.City}, {flight.Destination.Country}";
+        FlightPrice = $"${flight.PriceUsd}";
+
+        ShowOutputView();
     }
 
     public async Task<Price> GetRandomFlight(string DepatureIata, DateTime DepatureDate)

@@ -43,7 +43,7 @@ a, .btn-link {
 }
 
     #blazor-error-ui .dismiss {
-        cursor: pointer;E8F0FE
+        cursor: pointer;
         position: absolute;
         right: 0.75rem;
         top: 0.5rem;
@@ -63,7 +63,7 @@ body {
     background-color: #ffffff;
 }
 
-.departureInfoContainer {
+.appContainer {
     border: 1px solid #E8F0FE;
     border-radius: 4px;
     background-color: #E8F0FE;
@@ -73,9 +73,34 @@ body {
     text-align: center;
 }
 
-.AppBanner {
+.appBanner {
     background-image: url("../Images/flightbanner.png");
     background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center;
+    background-position: top;
+}
+
+.appTitle {
+    height: 100px;
+    padding-top: 20px;
+}
+
+.displayNone {
+    display:none;
+}
+
+.flightInfoContainer{
+    margin: 10px 0;
+}
+
+.flightCost {
+    color: #007F0E;
+}
+
+.flightHighlight {
+    font-size: x-large;
+    font-weight: bold;
+}
+
+.spacer {
+    height: 10px;
 }
