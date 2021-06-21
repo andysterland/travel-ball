@@ -1,0 +1,120 @@
+﻿@page "/"
+@using SharedObjects
+@using Microsoft.Extensions.Configuration
+@using Microsoft.JSInterop;
+@using BrowserInterop.Extensions
+@using BrowserInterop.Geolocation
+
+@inject IConfiguration Configuration
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
+<div class="departureInfoContainer">
+
+    <div class="appBanner">
+        <h1>Travell Ball!</h1>
+    </div>
+    <p class="">Choose the location and date you wish to travel below and we'll pick you a lucky destination!</p>
+
+    <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon1">When:</span>
+          </div>
+        <input id="" type="date" @bind="@DepatureDate" class="form-control" />
+    </div>
+
+    <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon1">From:</span>
+          </div>
+        <div class="input-group-append">
+            <input id="@_airportInfoBoxId" type="text" @bind="@DepatureAirport" class="form-control" placeholder="Airport" />
+            @if (GetGeoButtonIsBusy)
+            {
+                <div class="spinner-border text-secondary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            }
+            else
+            {
+                <button id="@_getGeoButtonId" class="btn btn-secondary px-3" @onclick="@GetGeoButton_OnClick"><i class="bi bi-geo-alt-fill"></i></button>
+            }
+        </div>
+    </div>
+
+    <button class="btn btn-primary" type="submit" @onclick="@Luck_OnClick"><i class="bi-dice-5-fill"></i> I'm feeling lucky!</button>
+
+</div>
+
+@code {
+    private string _serviceBaseUri;
+    private string _randomFligthUri = "/api/RandomFlight/{0}";
+    private string _nearestAirportUri = "/api/Departure/?Lat={0}&Long={1}";
+    private string _airportInfoBoxId = "airportInputBox";
+    private string _airportInfoBoxOptions = null;
+    private string _getGeoButtonId = "getGeoButton";
+    private WindowNavigatorGeolocation _geolocationWrapper;
+
+    public bool GetGeoButtonIsBusy { get; set; }
+    public string DepatureAirport { get; set; }
+    public DateTime DepatureDate { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _serviceBaseUri = Configuration["ServiceBaseUri"];
+        await JSRuntime.InvokeVoidAsync("AirportInput", _airportInfoBoxId, _airportInfoBoxOptions);
+
+        DepatureDate = DateTime.Now;
+        GetGeoButtonIsBusy = false;
+
+        var window = await JSRuntime.Window();
+        var navigator = await window.Navigator();
+        _geolocationWrapper = navigator.Geolocation;
+    }
+
+    public async Task GetGeoButton_OnClick()
+    {
+        GetGeoButtonIsBusy = true;
+        await GetGeolocation();
+        GetGeoButtonIsBusy = false;
+    }
+
+    public async Task GetGeolocation()
+    {
+        var geolocationResult = (await _geolocationWrapper.GetCurrentPosition(new PositionOptions()
+        {
+            EnableHighAccuracy = true,
+            MaximumAgeTimeSpan = TimeSpan.FromHours(1),
+            TimeoutTimeSpan = TimeSpan.FromMinutes(1)
+        }));
+
+        if (geolocationResult != null)
+        {
+            var position = geolocationResult.Location;
+            var airport = await GetNearestAirport(position.Coords.Latitude, position.Coords.Longitude);
+
+            if (airport != null)
+            {
+                DepatureAirport = $"{airport.IATA} {airport.Name}";
+            }
+        }
+    }
+
+    public async Task<Airport> GetNearestAirport(double Lat, double Long)
+    {
+        var uri = _serviceBaseUri + string.Format(_nearestAirportUri, Lat, Long);
+        return await Http.GetFromJsonAsync<Airport>(uri);
+    }
+
+    public async Task Luck_OnClick()
+    {
+        var iata = DepatureAirport.Substring(0, 3);
+        await GetRandomFlight(iata, DepatureDate);
+    }
+
+    public async Task<Price> GetRandomFlight(string DepatureIata, DateTime DepatureDate)
+    {
+        var uri = _serviceBaseUri + string.Format(_randomFligthUri, DepatureIata);
+        return await Http.GetFromJsonAsync<Price>(uri);
+    }
+}

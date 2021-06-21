@@ -9,6 +9,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SharedObjects\SharedObjects.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="AirportData.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

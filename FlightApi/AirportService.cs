@@ -1,4 +1,5 @@
 ﻿using CsvHelper;
+using SharedObjects;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -23,7 +24,6 @@ namespace FlightApi
         }
 
         // By design not efficent 
-
         public Airport GetAirport(string Code)
         {
             if(string.IsNullOrWhiteSpace(Code))
@@ -39,6 +39,41 @@ namespace FlightApi
                 }
             }
             return null;
+        }
+
+        // Hillariously not efficent 
+        public Airport GetNearestAiport(double Latitude, double Longitude)
+        {
+            var coord = new Position
+            {
+                Latitude = Latitude,
+                Longitude = Longitude
+            };
+
+            //var nearest = m_Airports.OrderBy(x => coord.GetDistanceTo(new GeoCoordinate(x.Lat, x.Long)));
+
+            var nearestDistance = double.MaxValue;
+            Airport nearest = null;
+            var hv = new Haversine();
+
+            foreach (var airport in m_Airports)
+            {
+                var currentCoord = new Position
+                {
+                    Latitude = airport.Lat,
+                    Longitude = airport.Long
+                };
+
+                var distance = hv.Distance(coord, currentCoord, DistanceType.Miles);
+
+                if (distance < nearestDistance)
+                {
+                    nearest = airport;
+                    nearestDistance = distance;
+                }
+            }
+
+            return nearest;
         }
     }
 }

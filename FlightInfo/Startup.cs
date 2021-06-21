@@ -17,6 +17,8 @@ namespace FlightInfo
 {
     public class Startup
     {
+        readonly string AllowAllCorsPolicy = "*";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -32,6 +34,16 @@ namespace FlightInfo
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "FlightInfo", Version = "v1" });
             });
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: AllowAllCorsPolicy,
+                    builder =>
+                    {
+                        builder.WithOrigins("*");
+                    });
+            });
+
 
             services.AddSingleton<IFlightDestinationService, FlightDestinationService>();
             services.AddSingleton<IAirportService, AirportService>();
@@ -52,9 +64,12 @@ namespace FlightInfo
 
             app.UseAuthorization();
 
+            app.UseCors();
+
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapControllers()
+                     .RequireCors(AllowAllCorsPolicy);
             });
 
             var user = Configuration["OpenSky:User"];
