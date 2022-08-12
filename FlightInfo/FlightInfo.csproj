@@ -1,11 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <UserSecretsId>b5eba698-f1c0-49f2-a295-9bd67477a277</UserSecretsId>
+    <ApplicationInsightsResourceId>/subscriptions/7262140c-ccfa-48c9-934d-aab7e37fa804/resourceGroups/andstertravellball/providers/microsoft.insights/components/travelballwww</ApplicationInsightsResourceId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.15.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
   </ItemGroup>
 
