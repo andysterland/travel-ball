@@ -38,7 +38,7 @@ namespace FlightApi
             foreach (var airportCode in airportCodes)
             {
                 var airport = AirportService.GetAirport(airportCode);
-                if (airport != null)
+                // if (airport != null)
                 {
                     airports.Add(airport);
                 }
