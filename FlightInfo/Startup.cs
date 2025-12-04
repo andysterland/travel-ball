@@ -1,4 +1,5 @@
 using FlightApi;
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -48,7 +49,10 @@ namespace FlightInfo
             services.AddSingleton<IFlightDestinationService, FlightDestinationService>();
             services.AddSingleton<IAirportService, AirportService>();
             services.AddSingleton<IPriceService, PriceService>();
-            services.AddApplicationInsightsTelemetry(Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
+            services.AddApplicationInsightsTelemetry(options =>
+            {
+                options.ConnectionString = Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -77,7 +81,7 @@ namespace FlightInfo
             var password = Configuration["OpenSky:Password"];
             flightService.Configure(user, password);
 
-            var airportDataPath = Path.Combine(env.ContentRootPath, @"Data\AirportData.csv");
+            var airportDataPath = Path.Combine(env.ContentRootPath, "Data", "AirportData.csv");
             airportService.Configure(airportDataPath);
         }
     }

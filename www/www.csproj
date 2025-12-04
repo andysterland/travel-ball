@@ -1,16 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ApplicationInsightsResourceId>/subscriptions/7262140c-ccfa-48c9-934d-aab7e37fa804/resourceGroups/andstertravellball/providers/microsoft.insights/components/travelballwww</ApplicationInsightsResourceId>
     <UserSecretsId>6c77105c-339a-404e-825c-3505b1cfd999</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="BrowserInterop" Version="1.1.2" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.15.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.0" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
