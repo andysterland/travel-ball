@@ -1,5 +1,6 @@
 using FlightApi;
 using NUnit.Framework;
+using System.IO;
 
 namespace FlightTests
 {
@@ -11,14 +12,16 @@ namespace FlightTests
         public void Setup()
         {
             m_aiportFactory = new AirportService();
+            var dataPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "AirportData.csv");
+            m_aiportFactory.Configure(dataPath);
         }
 
         [Test]
         public void TestLookup()
         {
             var airport = m_aiportFactory.GetAirport("LHR");
-            Assert.IsNotNull(airport);
-            Assert.AreEqual(airport.IATA, "LHR");
+            Assert.That(airport, Is.Not.Null);
+            Assert.That(airport.IATA, Is.EqualTo("LHR"));
             Assert.Pass();
         }
     }

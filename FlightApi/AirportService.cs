@@ -1,4 +1,5 @@
 ﻿using CsvHelper;
+using CsvHelper.Configuration;
 using SharedObjects;
 using System;
 using System.Collections.Generic;
@@ -16,8 +17,12 @@ namespace FlightApi
 
         public void Configure(string DataPath)
         {
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                PrepareHeaderForMatch = args => args.Header.Trim()
+            };
             using (var reader = new StreamReader(DataPath))
-            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+            using (var csv = new CsvReader(reader, config))
             {
                 m_Airports = csv.GetRecords<Airport>().ToList(); 
             }
